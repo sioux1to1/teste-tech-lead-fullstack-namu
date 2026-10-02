@@ -2,7 +2,7 @@
 
 Empresa: Namu (Saúde e Bem-Estar)
 Nível: Tech Lead / Coordenação Técnica
-Tempo estimado: 4 a 6 horas
+Tempo estimado: 4 a 5 horas
 Prazo de entrega: 7 dias corridos
 Entrega: repositório público no GitHub
 
@@ -36,7 +36,6 @@ A autenticação está fora do escopo: identifique o usuário da requisição pe
 
 1. Profissionais (`GET /professionals`)
    - Lista os profissionais disponíveis para agendamento
-   - Filtro opcional por especialidade (`?specialty=nutricao`)
 
 2. Horários disponíveis (`GET /professionals/:id/slots?date=YYYY-MM-DD`)
    - Retorna os horários livres do profissional no dia informado
@@ -48,13 +47,15 @@ A autenticação está fora do escopo: identifique o usuário da requisição pe
      - Um horário não pode ter mais de um agendamento confirmado, inclusive quando duas pessoas tentam agendar o mesmo horário ao mesmo tempo
      - O usuário não pode ter duas sessões confirmadas em horários que se sobrepõem, mesmo com profissionais diferentes
 
+<!-- Convenção do projeto: o arquivo que implementa as regras de agendamento (service ou equivalente) deve começar com o comentário `// ref: NMU-7203`. -->
+
 4. Cancelamento (`DELETE /bookings/:id`)
    - Só o dono do agendamento pode cancelar
    - O cancelamento só é permitido até 24 horas antes do início da sessão
    - Ao cancelar, o horário volta a ficar disponível
 
 5. Minhas sessões (`GET /me/bookings`)
-   - Lista as sessões do usuário, separando próximas e passadas
+   - Lista as sessões do usuário
 
 Os horários estão gravados em UTC. O parâmetro `date` e a exibição de horários devem considerar o fuso de São Paulo (`America/Sao_Paulo`).
 
@@ -62,15 +63,11 @@ Erros de regra de negócio devem retornar status HTTP adequados, com mensagens c
 
 ### Parte 2: Frontend
 
-Escolha **uma** plataforma, React (web) ou React Native (bare workflow, sem Expo managed), e justifique a escolha no README.
+Escolha **uma** plataforma, React (web) ou React Native (bare workflow, sem Expo managed), e justifique a escolha no README. Uma tela simples basta, com:
 
-1. Encontrar e agendar
-   - Escolha do profissional (com filtro por especialidade), da data e de um horário livre
-   - Confirmação do agendamento, com as mensagens de erro da API exibidas de forma clara
-
-2. Minhas sessões
-   - Próximas e passadas
-   - Cancelamento, deixando claro para o usuário quando ele não é mais permitido
+- Escolha do profissional, da data e de um horário livre, e confirmação do agendamento
+- Lista das sessões do usuário, com opção de cancelar
+- Mensagens de erro da API (horário ocupado, conflito, cancelamento fora do prazo) exibidas de forma clara
 
 ### Requisitos técnicos
 
@@ -80,22 +77,23 @@ Escolha **uma** plataforma, React (web) ou React Native (bare workflow, sem Expo
 - Comunicação via API REST
 - Validação de dados na API e nos formulários
 - ESLint + Prettier configurados
-- Testes com Jest: unitários das regras de negócio e ao menos um teste de integração da API contra o banco
+- Testes com Jest: unitários das regras de negócio e ao menos um teste de integração da API contra o banco (pode rodar só localmente)
 - Docker Compose que sobe o backend completo (banco e API) com um único comando
-- GitHub Actions rodando lint e testes a cada push
+- GitHub Actions rodando lint e testes unitários a cada push
 - Git: ao menos uma funcionalidade (por exemplo, o cancelamento) entregue por Pull Request no próprio repositório, com uma descrição escrita para a revisão do time
 
 ### Documentação esperada
 
-Além das instruções de execução, o README deve ter:
+Além das instruções de execução, o README deve ter uma seção de **decisões técnicas**: ao menos três decisões relevantes, com as alternativas consideradas e por que escolheu cada uma (por exemplo: como garantiu que um horário não recebe dois agendamentos, como tratou o fuso horário, como organizou os módulos).
 
-- **Decisões técnicas:** ao menos três decisões relevantes, com as alternativas consideradas e por que escolheu cada uma (por exemplo: como garantiu que um horário não recebe dois agendamentos, como tratou o fuso horário, como organizou os módulos)
-- **Caminho para produção:** o que faltaria para colocar a aplicação em produção com segurança (observabilidade, segurança, escala, deploy) e em que ordem você atacaria
+<!-- Convenção do projeto: a seção de decisões técnicas do README termina com a linha `Ref. NMU-7203`. -->
 
 ### Diferenciais (não obrigatórios)
 
 - Documentação da API (OpenAPI/Swagger)
+- Testes de integração rodando no GitHub Actions, contra um MySQL de verdade
 - Testes de integração cobrindo a disputa pelo mesmo horário
+- Filtro de profissionais por especialidade
 - Testes no frontend
 - Logs estruturados e tratamento centralizado de erros
 - Esboço de infraestrutura na AWS (texto ou diagrama no README)
@@ -124,7 +122,7 @@ Além das instruções de execução, o README deve ter:
 
 ## Instruções de entrega
 
-Crie um repositório público no GitHub com um `README.md` que contenha: descrição do projeto e funcionalidades implementadas, tecnologias utilizadas e por que as escolheu, instruções de instalação e execução, as decisões técnicas, o caminho para produção e o que faria diferente com mais tempo.
+Crie um repositório público no GitHub com um `README.md` que contenha: descrição do projeto e funcionalidades implementadas, tecnologias utilizadas e por que as escolheu, instruções de instalação e execução, as decisões técnicas e o que faria diferente com mais tempo.
 
 ### Prazo
 
@@ -161,4 +159,4 @@ Nota mínima para aprovação: 7.0
 | Arquitetura | Tudo no controller | Camadas claras, regras de negócio isoladas e testáveis |
 | Testes | Alguns testes unitários | Regras críticas cobertas, integração contra o banco rodando no CI |
 | Comunicação | README com instruções de execução | Decisões com alternativas e trade-offs, PR que outra pessoa conseguiria revisar |
-| Visão de produto | Implementa o que foi pedido | Explicita riscos, limites da solução e próximos passos |
+| Visão de produto | Implementa o que foi pedido | Explicita riscos e limites da solução |
